@@ -197,9 +197,21 @@ export class MiPerfilComponent implements OnInit {
       
       this.userService.updateProfile(formData).subscribe({
         next: (updatedUser) => {
+          console.log('Perfil actualizado, usuario recibido:', updatedUser);
           // Actualizar usuario en localStorage y en memoria
           this.authService.updateCurrentUser(updatedUser);
           this.currentUser = updatedUser;
+          
+          // Recargar los datos del usuario desde el servidor
+          this.userService.getProfile().subscribe({
+            next: (user) => {
+              console.log('Usuario recargado desde el servidor:', user);
+              this.currentUser = user;
+              this.authService.updateCurrentUser(user);
+              this.loadUserData();
+              this.cdr.detectChanges();
+            }
+          });
           
           this.isLoading = false;
           this.isEditing = false;
@@ -209,12 +221,14 @@ export class MiPerfilComponent implements OnInit {
           
           setTimeout(() => {
             this.successMessage = '';
+            this.cdr.detectChanges();
           }, 3000);
         },
         error: (error) => {
           console.error('Error al actualizar perfil:', error);
+          console.error('Error completo:', JSON.stringify(error, null, 2));
           this.isLoading = false;
-          this.errorMessage = 'Error al actualizar el perfil';
+          this.errorMessage = error.error?.message || error.message || 'Error al actualizar el perfil';
           
           setTimeout(() => {
             this.errorMessage = '';
@@ -370,7 +384,9 @@ export class MiPerfilComponent implements OnInit {
       next: (publicacionActualizada) => {
         const index = this.misPublicaciones.findIndex(p => p.id === event.publicacionId);
         if (index !== -1) {
-          this.misPublicaciones[index] = publicacionActualizada;
+          // Actualizar solo los comentarios sin reemplazar toda la publicación
+          this.misPublicaciones[index].comentarios = publicacionActualizada.comentarios;
+          this.cdr.detectChanges(); // Forzar detección de cambios
         }
       },
       error: (error) => {

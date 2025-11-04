@@ -68,16 +68,23 @@ export class PublicacionesComponent implements OnInit {
     }
 
     // Cargar todas las publicaciones disponibles (aumentar el límite inicial)
-    this.publicacionService.getPublicaciones(this.ordenarPor, undefined, this.offset, 100).subscribe({
-      next: (publicaciones) => {
-        console.log('Publicaciones cargadas:', publicaciones);
-        this.publicaciones = [...this.publicaciones, ...publicaciones];
-        this.hayMasPublicaciones = publicaciones.length === 100;
-      },
-      error: (error) => {
-        console.error('Error al cargar publicaciones:', error);
-      }
-    });
+    this.publicacionService.getPublicaciones(this.ordenarPor, undefined, this.offset, 100)
+      .pipe(
+        finalize(() => {
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (publicaciones) => {
+          console.log('Publicaciones cargadas:', publicaciones);
+          this.publicaciones = [...this.publicaciones, ...publicaciones];
+          this.hayMasPublicaciones = publicaciones.length === 100;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al cargar publicaciones:', error);
+        }
+      });
   }
 
   cambiarOrden(orden: 'fecha' | 'likes') {
@@ -208,21 +215,27 @@ export class PublicacionesComponent implements OnInit {
         formData.append('imagen', this.selectedImageFile, this.selectedImageFile.name);
       }
 
-      this.publicacionService.crearPublicacion(formData).subscribe({
-        next: (publicacion) => {
-          console.log('Publicación creada:', publicacion);
-          this.cargarPublicaciones();
-          this.nuevaPublicacionForm.reset();
-          this.clearImage();
-          this.showNewPostForm = false;
-          this.isCreatingPost = false;
-        },
-        error: (error) => {
-          console.error('Error al crear publicación:', error);
-          this.isCreatingPost = false;
-          alert('No se pudo crear la publicación. Intenta nuevamente.');
-        }
-      });
+      this.publicacionService.crearPublicacion(formData)
+        .pipe(
+          finalize(() => {
+            this.isCreatingPost = false;
+            this.cdr.detectChanges();
+          })
+        )
+        .subscribe({
+          next: (publicacion) => {
+            console.log('Publicación creada:', publicacion);
+            // Recargar publicaciones para asegurar sincronización
+            this.cargarPublicaciones(true);
+            this.nuevaPublicacionForm.reset();
+            this.clearImage();
+            this.showNewPostForm = false;
+          },
+          error: (error) => {
+            console.error('Error al crear publicación:', error);
+            alert('No se pudo crear la publicación. Intenta nuevamente.');
+          }
+        });
     }
   }
 
@@ -311,7 +324,9 @@ export class PublicacionesComponent implements OnInit {
       next: (publicacionActualizada) => {
         const index = this.publicaciones.findIndex(p => p.id === event.publicacionId);
         if (index !== -1) {
-          this.publicaciones[index] = publicacionActualizada;
+          // Actualizar solo los comentarios sin reemplazar toda la publicación
+          this.publicaciones[index].comentarios = publicacionActualizada.comentarios;
+          this.cdr.detectChanges(); // Forzar detección de cambios
         }
       },
       error: (error) => {
