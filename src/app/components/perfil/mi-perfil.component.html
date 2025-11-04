@@ -1,0 +1,378 @@
+<div class="perfil-container">
+  <!-- Header de la aplicación -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow">
+    <div class="container">
+      <a class="navbar-brand fw-bold" routerLink="/publicaciones">
+        <i class="fas fa-users me-2"></i>Red Social
+      </a>
+      
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" routerLink="/publicaciones">
+          <i class="fas fa-home me-1"></i>Inicio
+        </a>
+        <a class="nav-link" href="#" (click)="logout()">
+          <i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4" *ngIf="currentUser">
+    <div class="row">
+      <div class="col-12 col-lg-8 mx-auto">
+        
+        <!-- Mensajes de estado -->
+        <div class="alert alert-success alert-dismissible fade show" *ngIf="successMessage">
+          <i class="fas fa-check-circle me-2"></i>
+          {{ successMessage }}
+          <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+        </div>
+
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{ errorMessage }}
+        </div>
+
+        <!-- Tarjeta del perfil -->
+        <div class="card border-0 shadow">
+          <!-- Header del perfil -->
+          <div class="card-header bg-gradient-primary text-white">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <div class="d-flex align-items-center">
+                  <div class="avatar-large me-3">
+                    <i class="fas fa-user-circle fa-5x text-white"></i>
+                  </div>
+                  <div>
+                    <h2 class="mb-1">{{ currentUser.nombre }} {{ currentUser.apellido }}</h2>
+                    <p class="mb-1">@{{ currentUser.nombreUsuario }}</p>
+                    <small class="opacity-75">
+                      <i class="fas fa-calendar-alt me-1"></i>
+                      Miembro desde {{ formatDate(currentUser.fechaRegistro || currentUser.fechaNacimiento) }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 text-md-end">
+                <button 
+                  class="btn btn-light"
+                  (click)="toggleEdit()"
+                  [disabled]="isLoading">
+                  <i class="fas fa-edit me-2"></i>
+                  {{ isEditing ? 'Cancelar' : 'Editar Perfil' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información del perfil (modo vista) -->
+          <div class="card-body" *ngIf="!isEditing">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <label class="form-label fw-bold text-muted">Correo Electrónico</label>
+                  <p class="mb-0">
+                    <i class="fas fa-envelope me-2 text-primary"></i>
+                    {{ currentUser.correo }}
+                  </p>
+                </div>
+
+                <div class="info-item mb-3">
+                  <label class="form-label fw-bold text-muted">Fecha de Nacimiento</label>
+                  <p class="mb-0">
+                    <i class="fas fa-birthday-cake me-2 text-primary"></i>
+                    {{ formatDate(currentUser.fechaNacimiento) }}
+                    <span class="badge bg-light text-dark ms-2">{{ calculateAge() }} años</span>
+                  </p>
+                </div>
+
+                <div class="info-item mb-3">
+                  <label class="form-label fw-bold text-muted">Tipo de Perfil</label>
+                  <p class="mb-0">
+                    <i class="fas fa-user-tag me-2 text-primary"></i>
+                    <span class="badge bg-primary">{{ currentUser.perfil | titlecase }}</span>
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <label class="form-label fw-bold text-muted">Descripción</label>
+                  <div class="descripcion-box">
+                    <i class="fas fa-quote-left me-2 text-primary"></i>
+                    {{ currentUser.descripcionBreve }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulario de edición -->
+          <div class="card-body" *ngIf="isEditing">
+            <form [formGroup]="perfilForm" (ngSubmit)="onSubmit()">
+              <div class="row">
+                <!-- Información personal -->
+                <div class="col-md-6">
+                  <h5 class="mb-3 text-primary">
+                    <i class="fas fa-user me-2"></i>Información Personal
+                  </h5>
+
+                  <!-- Imagen de perfil -->
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Imagen de Perfil</label>
+                    <div class="text-center mb-3">
+                      <div *ngIf="imagePreview || currentUser.imagenPerfil" class="mb-2">
+                        <img 
+                          [src]="imagePreview || currentUser.imagenPerfil" 
+                          class="rounded-circle" 
+                          style="width: 150px; height: 150px; object-fit: cover;"
+                          alt="Preview">
+                      </div>
+                      <i *ngIf="!imagePreview && !currentUser.imagenPerfil" class="fas fa-user-circle fa-5x text-primary mb-2"></i>
+                      <input 
+                        type="file" 
+                        class="form-control" 
+                        accept="image/*"
+                        (change)="onImageSelected($event)">
+                      <small class="text-muted">Formato: JPG, PNG, GIF (Máximo 5MB)</small>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="nombre" class="form-label fw-bold">Nombre</label>
+                    <input
+                      type="text"
+                      id="nombre"
+                      class="form-control"
+                      formControlName="nombre"
+                      [class.is-invalid]="perfilForm.get('nombre')?.invalid && perfilForm.get('nombre')?.touched">
+                    <div class="invalid-feedback" *ngIf="getErrorMessage('nombre')">
+                      {{ getErrorMessage('nombre') }}
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="apellido" class="form-label fw-bold">Apellido</label>
+                    <input
+                      type="text"
+                      id="apellido"
+                      class="form-control"
+                      formControlName="apellido"
+                      [class.is-invalid]="perfilForm.get('apellido')?.invalid && perfilForm.get('apellido')?.touched">
+                    <div class="invalid-feedback" *ngIf="getErrorMessage('apellido')">
+                      {{ getErrorMessage('apellido') }}
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="fechaNacimiento" class="form-label fw-bold">Fecha de Nacimiento</label>
+                    <input
+                      type="date"
+                      id="fechaNacimiento"
+                      class="form-control"
+                      formControlName="fechaNacimiento"
+                      [class.is-invalid]="perfilForm.get('fechaNacimiento')?.invalid && perfilForm.get('fechaNacimiento')?.touched">
+                    <div class="invalid-feedback" *ngIf="getErrorMessage('fechaNacimiento')">
+                      {{ getErrorMessage('fechaNacimiento') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Información de cuenta -->
+                <div class="col-md-6">
+                  <h5 class="mb-3 text-primary">
+                    <i class="fas fa-cog me-2"></i>Información de Cuenta
+                  </h5>
+
+                  <div class="mb-3">
+                    <label for="correo" class="form-label fw-bold">Correo Electrónico</label>
+                    <input
+                      type="email"
+                      id="correo"
+                      class="form-control"
+                      formControlName="correo"
+                      [class.is-invalid]="perfilForm.get('correo')?.invalid && perfilForm.get('correo')?.touched">
+                    <div class="invalid-feedback" *ngIf="getErrorMessage('correo')">
+                      {{ getErrorMessage('correo') }}
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="nombreUsuario" class="form-label fw-bold">Nombre de Usuario</label>
+                    <input
+                      type="text"
+                      id="nombreUsuario"
+                      class="form-control"
+                      formControlName="nombreUsuario"
+                      [class.is-invalid]="perfilForm.get('nombreUsuario')?.invalid && perfilForm.get('nombreUsuario')?.touched">
+                    <div class="invalid-feedback" *ngIf="getErrorMessage('nombreUsuario')">
+                      {{ getErrorMessage('nombreUsuario') }}
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="descripcionBreve" class="form-label fw-bold">Descripción</label>
+                    <textarea
+                      id="descripcionBreve"
+                      class="form-control"
+                      rows="4"
+                      formControlName="descripcionBreve"
+                      maxlength="200"
+                      [class.is-invalid]="perfilForm.get('descripcionBreve')?.invalid && perfilForm.get('descripcionBreve')?.touched"></textarea>
+                    <small class="form-text text-muted">
+                      {{ perfilForm.get('descripcionBreve')?.value?.length || 0 }}/200 caracteres
+                    </small>
+                    <div class="invalid-feedback" *ngIf="getErrorMessage('descripcionBreve')">
+                      {{ getErrorMessage('descripcionBreve') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones de acción -->
+              <div class="d-flex gap-2 justify-content-end">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  (click)="toggleEdit()">
+                  <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-success"
+                  [disabled]="perfilForm.invalid || isLoading">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  <i *ngIf="!isLoading" class="fas fa-save me-2"></i>
+                  {{ isLoading ? 'Guardando...' : 'Guardar Cambios' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Sección de mis publicaciones -->
+        <div class="card border-0 shadow mt-4">
+          <div class="card-header bg-white border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fas fa-newspaper me-2 text-primary"></i>
+                Mis Publicaciones
+              </h5>
+              <!-- Controles de ordenamiento -->
+              <div class="btn-group btn-group-sm" role="group">
+                <button 
+                  type="button" 
+                  class="btn"
+                  [ngClass]="ordenarPor === 'fecha' ? 'btn-primary' : 'btn-outline-primary'"
+                  (click)="cambiarOrden('fecha')">
+                  <i class="fas fa-clock me-1"></i>Recientes
+                </button>
+                <button 
+                  type="button" 
+                  class="btn"
+                  [ngClass]="ordenarPor === 'likes' ? 'btn-primary' : 'btn-outline-primary'"
+                  (click)="cambiarOrden('likes')">
+                  <i class="fas fa-heart me-1"></i>Populares
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Loading inicial -->
+            <div *ngIf="cargandoPublicaciones && misPublicaciones.length === 0" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              <p class="text-muted mt-2">Cargando publicaciones...</p>
+            </div>
+
+            <!-- Publicaciones -->
+            <div *ngIf="!cargandoPublicaciones || misPublicaciones.length > 0">
+              <!-- Contador de publicaciones -->
+              <div *ngIf="misPublicaciones.length > 0" class="mb-3">
+                <small class="text-muted">
+                  <i class="fas fa-list me-1"></i>
+                  {{ misPublicaciones.length }} {{ misPublicaciones.length === 1 ? 'publicación' : 'publicaciones' }}
+                </small>
+              </div>
+
+              <app-publicacion-card
+                *ngFor="let publicacion of misPublicaciones"
+                [publicacion]="publicacion"
+                (onLike)="handleLike($event)"
+                (onUnlike)="handleUnlike($event)"
+                (onDelete)="handleDelete($event)"
+                (onComment)="handleComment($event)">
+              </app-publicacion-card>
+
+              <!-- Botón cargar más -->
+              <div *ngIf="hayMasPublicaciones && misPublicaciones.length > 0" class="text-center mt-4">
+                <button 
+                  class="btn btn-outline-primary"
+                  (click)="cargarMasPublicaciones()"
+                  [disabled]="cargandoMas">
+                  <span *ngIf="cargandoMas" class="spinner-border spinner-border-sm me-2"></span>
+                  <i *ngIf="!cargandoMas" class="fas fa-arrow-down me-2"></i>
+                  {{ cargandoMas ? 'Cargando...' : 'Cargar más publicaciones' }}
+                </button>
+              </div>
+
+              <!-- Sin publicaciones -->
+              <div *ngIf="misPublicaciones.length === 0 && !cargandoPublicaciones" class="text-center py-5">
+                <i class="fas fa-pen-nib fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Aún no tienes publicaciones</h5>
+                <p class="text-muted mb-3">Empieza a compartir tus ideas con la comunidad</p>
+                <a routerLink="/publicaciones" class="btn btn-primary">
+                  <i class="fas fa-plus me-2"></i>Crear Publicación
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Botón flotante para cambiar tema -->
+<button class="theme-toggle" (click)="themeService.toggleDarkMode()" 
+        [title]="themeService.isDarkMode() ? 'Modo Claro' : 'Modo Oscuro'">
+  <i [class]="themeService.isDarkMode() ? 'fas fa-sun' : 'fas fa-moon'"></i>
+</button>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade show" *ngIf="mostrarModalEliminar" 
+     [style.display]="'block'" 
+     [style.background-color]="'rgba(0,0,0,0.5)'"
+     tabindex="-1" 
+     role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-danger text-white border-0">
+        <h5 class="modal-title">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Confirmar Eliminación
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cancelarEliminacion()"></button>
+      </div>
+      <div class="modal-body py-4">
+        <div class="text-center">
+          <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+          <p class="mb-0 fs-5">¿Estás seguro de que deseas eliminar esta publicación?</p>
+          <p class="text-muted mt-2">Esta acción no se puede deshacer.</p>
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-light">
+        <button type="button" class="btn btn-secondary" (click)="cancelarEliminacion()">
+          <i class="fas fa-times me-1"></i>
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmarEliminacion()">
+          <i class="fas fa-trash me-1"></i>
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

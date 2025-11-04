@@ -1,0 +1,226 @@
+<div class="registro-container">
+  <div class="container-fluid min-vh-100 py-5 bg-light">
+    <div class="row">
+      <div class="col-12 col-md-8 col-lg-6 mx-auto">
+        <div class="card shadow-lg border-0">
+          <div class="card-header bg-success text-white text-center py-4">
+            <h2 class="mb-0">
+              <i class="fas fa-user-plus me-2"></i>Red Social
+            </h2>
+            <p class="mb-0 mt-2">Crear Nueva Cuenta</p>
+          </div>
+          
+          <div class="card-body p-4">
+            <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+              
+              <!-- Información Personal -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="nombre" class="form-label">Nombre *</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-user"></i>
+                    </span>
+                    <input
+                      type="text"
+                      id="nombre"
+                      class="form-control"
+                      formControlName="nombre"
+                      placeholder="Tu nombre"
+                      [class.is-invalid]="registroForm.get('nombre')?.invalid && registroForm.get('nombre')?.touched">
+                  </div>
+                  <div class="invalid-feedback" *ngIf="getErrorMessage('nombre')">
+                    {{ getErrorMessage('nombre') }}
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="apellido" class="form-label">Apellido *</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-user"></i>
+                    </span>
+                    <input
+                      type="text"
+                      id="apellido"
+                      class="form-control"
+                      formControlName="apellido"
+                      placeholder="Tu apellido"
+                      [class.is-invalid]="registroForm.get('apellido')?.invalid && registroForm.get('apellido')?.touched">
+                  </div>
+                  <div class="invalid-feedback" *ngIf="getErrorMessage('apellido')">
+                    {{ getErrorMessage('apellido') }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Credenciales -->
+              <div class="mb-3">
+                <label for="correo" class="form-label">Correo Electrónico *</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-envelope"></i>
+                  </span>
+                  <input
+                    type="email"
+                    id="correo"
+                    class="form-control"
+                    formControlName="correo"
+                    placeholder="correo@ejemplo.com"
+                    [class.is-invalid]="registroForm.get('correo')?.invalid && registroForm.get('correo')?.touched">
+                </div>
+                <div class="invalid-feedback" *ngIf="getErrorMessage('correo')">
+                  {{ getErrorMessage('correo') }}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="nombreUsuario" class="form-label">Nombre de Usuario *</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-at"></i>
+                  </span>
+                  <input
+                    type="text"
+                    id="nombreUsuario"
+                    class="form-control"
+                    formControlName="nombreUsuario"
+                    placeholder="usuario123"
+                    [class.is-invalid]="registroForm.get('nombreUsuario')?.invalid && registroForm.get('nombreUsuario')?.touched">
+                </div>
+                <small class="form-text text-muted">Solo letras, números y guiones bajos</small>
+                <div class="invalid-feedback" *ngIf="getErrorMessage('nombreUsuario')">
+                  {{ getErrorMessage('nombreUsuario') }}
+                </div>
+              </div>
+
+              <!-- Contraseñas -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="contraseña" class="form-label">Contraseña *</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-lock"></i>
+                    </span>
+                    <input
+                      type="password"
+                      id="contraseña"
+                      class="form-control"
+                      formControlName="contraseña"
+                      placeholder="Contraseña segura"
+                      [class.is-invalid]="registroForm.get('contraseña')?.invalid && registroForm.get('contraseña')?.touched">
+                  </div>
+                  <small class="form-text text-muted">Mín. 8 caracteres, 1 mayúscula y 1 número</small>
+                  <div class="invalid-feedback" *ngIf="getErrorMessage('contraseña')">
+                    {{ getErrorMessage('contraseña') }}
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="repetirContraseña" class="form-label">Repetir Contraseña *</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-lock"></i>
+                    </span>
+                    <input
+                      type="password"
+                      id="repetirContraseña"
+                      class="form-control"
+                      formControlName="repetirContraseña"
+                      placeholder="Confirmar contraseña"
+                      [class.is-invalid]="registroForm.get('repetirContraseña')?.invalid && registroForm.get('repetirContraseña')?.touched">
+                  </div>
+                  <div class="invalid-feedback" *ngIf="getErrorMessage('repetirContraseña')">
+                    {{ getErrorMessage('repetirContraseña') }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Información Adicional -->
+              <div class="mb-3">
+                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-calendar"></i>
+                  </span>
+                  <input
+                    type="date"
+                    id="fechaNacimiento"
+                    class="form-control"
+                    formControlName="fechaNacimiento"
+                    [class.is-invalid]="registroForm.get('fechaNacimiento')?.invalid && registroForm.get('fechaNacimiento')?.touched">
+                </div>
+                <div class="invalid-feedback" *ngIf="getErrorMessage('fechaNacimiento')">
+                  {{ getErrorMessage('fechaNacimiento') }}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="descripcionBreve" class="form-label">Descripción Breve *</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-info-circle"></i>
+                  </span>
+                  <textarea
+                    id="descripcionBreve"
+                    class="form-control"
+                    formControlName="descripcionBreve"
+                    rows="3"
+                    placeholder="Cuéntanos un poco sobre ti..."
+                    maxlength="200"
+                    [class.is-invalid]="registroForm.get('descripcionBreve')?.invalid && registroForm.get('descripcionBreve')?.touched"></textarea>
+                </div>
+                <small class="form-text text-muted">Máximo 200 caracteres</small>
+                <div class="invalid-feedback" *ngIf="getErrorMessage('descripcionBreve')">
+                  {{ getErrorMessage('descripcionBreve') }}
+                </div>
+              </div>
+
+              <!-- Imagen de Perfil -->
+              <div class="mb-3">
+                <label for="imagenPerfil" class="form-label">Imagen de Perfil (Opcional)</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-image"></i>
+                  </span>
+                  <input
+                    type="file"
+                    id="imagenPerfil"
+                    class="form-control"
+                    accept="image/jpeg,image/jpg,image/png"
+                    (change)="onFileSelected($event)">
+                </div>
+                <small class="form-text text-muted">JPG, JPEG o PNG. Máximo 5MB</small>
+              </div>
+
+              <!-- Mensaje de error general -->
+              <div class="alert alert-danger" *ngIf="errorMessage">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ errorMessage }}
+              </div>
+
+              <!-- Botones -->
+              <div class="d-grid">
+                <button
+                  type="submit"
+                  class="btn btn-success btn-lg"
+                  [disabled]="isLoading">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <i *ngIf="!isLoading" class="fas fa-user-plus me-2"></i>
+                  {{ isLoading ? 'Creando cuenta...' : 'Crear Cuenta' }}
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <div class="card-footer text-center bg-light">
+            <p class="mb-0">
+              ¿Ya tienes una cuenta?
+              <a routerLink="/login" class="text-success fw-bold">Inicia sesión aquí</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

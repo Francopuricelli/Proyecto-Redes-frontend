@@ -1,0 +1,97 @@
+<div class="card mb-3 publicacion-card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <div class="me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-user-circle fa-2x text-primary"></i>
+      </div>
+      <div>
+        <strong>{{ publicacion.autor.nombre }} {{ publicacion.autor.apellido }}</strong>
+        <small class="text-muted d-block">@{{ publicacion.autor.nombreUsuario }}</small>
+      </div>
+    </div>
+    
+    <div class="d-flex align-items-center">
+      <small class="text-muted me-3">{{ publicacion.fecha | date: 'dd/MM/yyyy HH:mm' }}</small>
+      <button 
+        *ngIf="esPublicacionPropia" 
+        class="btn btn-sm btn-outline-danger"
+        (click)="eliminar()"
+        title="Eliminar publicación">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <h5 class="card-title">{{ publicacion.titulo }}</h5>
+    <p class="card-text">{{ publicacion.contenido }}</p>
+    
+    <img 
+      *ngIf="publicacion.imagen" 
+      [src]="publicacion.imagen" 
+      class="img-fluid rounded mb-3" 
+      alt="Imagen de publicación"
+      style="max-height: 500px; object-fit: contain; width: 100%;">
+  </div>
+
+  <div class="card-footer">
+    <!-- Botones de interacción -->
+    <div class="d-flex justify-content-start align-items-center mb-3">
+      <button 
+        class="btn btn-sm me-3"
+        [ngClass]="usuarioLeDioLike ? 'btn-primary' : 'btn-outline-primary'"
+        (click)="toggleLike()">
+        <i class="fas fa-heart"></i>
+        <span class="ms-1">{{ publicacion.cantidadLikes || publicacion.likes.length }} Me gusta</span>
+      </button>
+      
+      <button 
+        class="btn btn-sm btn-outline-secondary"
+        (click)="toggleComentarios()">
+        <i class="fas fa-comment"></i>
+        <span class="ms-1">{{ publicacion.comentarios.length }} Comentarios</span>
+      </button>
+    </div>
+
+    <!-- Sección de comentarios -->
+    <div *ngIf="mostrarComentarios" class="comentarios-section">
+      <hr>
+      
+      <!-- Lista de comentarios -->
+      <div *ngFor="let comentario of publicacion.comentarios" class="comentario mb-3">
+        <div class="d-flex">
+          <div class="me-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-user-circle text-primary"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="bg-light rounded p-2">
+              <strong>{{ comentario.autor.nombre }} {{ comentario.autor.apellido }}</strong>
+              <small class="text-muted ms-2">@{{ comentario.autor.nombreUsuario }}</small>
+              <p class="mb-0 mt-1">{{ comentario.comentario }}</p>
+            </div>
+            <small class="text-muted ms-2">{{ comentario.fecha | date: 'dd/MM/yyyy HH:mm' }}</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario para nuevo comentario -->
+      <div class="nuevo-comentario mt-3">
+        <div class="input-group">
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Escribe un comentario..."
+            [(ngModel)]="nuevoComentario"
+            (keyup.enter)="agregarComentario()">
+          <button 
+            class="btn btn-primary" 
+            type="button"
+            (click)="agregarComentario()"
+            [disabled]="!nuevoComentario.trim()">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

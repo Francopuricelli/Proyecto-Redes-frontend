@@ -1,0 +1,251 @@
+.publicaciones-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
+}
+
+// Dark mode styles
+:host-context(body.dark-mode) {
+  .publicaciones-container {
+    background-color: #1a1a1a;
+  }
+  
+  .card-title {
+    color: #e4e4e4;
+  }
+  
+  .card-text {
+    color: #b0b0b0;
+  }
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+}
+
+.publicacion-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.publicacion-card:hover {
+  transform: translateY(-2px);
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1rem 1.25rem 0.5rem;
+}
+
+.avatar i {
+  font-size: 2.5rem;
+}
+
+.avatar-small i {
+  font-size: 1.5rem;
+}
+
+.card-title {
+  color: #333;
+  font-weight: 600;
+}
+
+.card-text {
+  color: #666;
+  line-height: 1.6;
+}
+
+.card-footer {
+  padding: 0.75rem 1.25rem;
+}
+
+.btn-link {
+  border: none;
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border-radius: 8px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  }
+
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+.btn-link.text-danger:hover {
+  color: #dc3545 !important;
+}
+
+.comments-section {
+  background-color: #f8f9fa;
+  margin: 0 -1.25rem -0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.comentario {
+  margin-bottom: 0.75rem;
+}
+
+.comentario:last-child {
+  margin-bottom: 0;
+}
+
+.bg-light {
+  background-color: #ffffff !important;
+  border: 1px solid #e9ecef;
+}
+
+.input-group .form-control {
+  border-right: none;
+}
+
+.input-group .btn {
+  border-left: none;
+}
+
+/* Estilos para el formulario de nueva publicación */
+.card-body form .form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+.btn-success {
+  background: linear-gradient(45deg, #28a745, #20c997);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .comments-section {
+    margin: 0 -1rem -0.75rem;
+    padding: 1rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.publicacion-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.comments-section {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Estilos para vista previa de imagen
+.image-preview {
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  img {
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .remove-image-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f8f9fa;
+      border-color: #dc3545;
+      transform: scale(1.1);
+    }
+
+    i {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+// Estilos para transiciones suaves
+.row {
+  transition: all 0.3s ease-in-out;
+}
+
+// Mensaje de creación de publicación
+.text-center {
+  &.text-muted {
+    animation: fadeInUp 0.4s ease-out;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive para botones de imagen
+@media (max-width: 576px) {
+  .btn-link {
+    padding: 0.5rem;
+    
+    i {
+      font-size: 1.2rem;
+    }
+  }
+}

@@ -1,0 +1,233 @@
+<div class="publicaciones-container">
+  <!-- Header de la aplicación -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/publicaciones">
+        <i class="fas fa-users me-2"></i>Red Social
+      </a>
+      
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" routerLink="/perfil">
+          <i class="fas fa-user me-1"></i>Mi Perfil
+        </a>
+        <a class="nav-link" href="#" (click)="logout()">
+          <i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <!-- Mensajes de estado -->
+    <div class="alert alert-success alert-dismissible fade show" *ngIf="successMessage">
+      <i class="fas fa-check-circle me-2"></i>
+      {{ successMessage }}
+      <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+    </div>
+
+    <div class="alert alert-danger alert-dismissible fade show" *ngIf="errorMessage">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ errorMessage }}
+      <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+    </div>
+
+    <!-- Botón para nueva publicación -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center" *ngIf="!showNewPostForm">
+            <button class="btn btn-primary btn-lg" (click)="toggleNewPostForm()">
+              <i class="fas fa-plus me-2"></i>¿Qué estás pensando?
+            </button>
+          </div>
+          
+          <!-- Formulario de nueva publicación -->
+          <div class="card-body" *ngIf="showNewPostForm">
+            <form [formGroup]="nuevaPublicacionForm" (ngSubmit)="crearPublicacion()">
+              <div class="mb-3">
+                <label for="titulo" class="form-label fw-bold">Título</label>
+                <input
+                  type="text"
+                  id="titulo"
+                  class="form-control"
+                  formControlName="titulo"
+                  placeholder="¿De qué quieres hablar?"
+                  [class.is-invalid]="nuevaPublicacionForm.get('titulo')?.invalid && nuevaPublicacionForm.get('titulo')?.touched">
+              </div>
+
+              <div class="mb-3">
+                <label for="contenido" class="form-label fw-bold">Contenido</label>
+                <textarea
+                  id="contenido"
+                  class="form-control"
+                  rows="4"
+                  formControlName="contenido"
+                  placeholder="Comparte tus pensamientos..."
+                  [class.is-invalid]="nuevaPublicacionForm.get('contenido')?.invalid && nuevaPublicacionForm.get('contenido')?.touched"></textarea>
+                <div class="invalid-feedback">
+                  El contenido no puede estar vacío.
+                </div>
+              </div>
+
+              <!-- Sección de imagen -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Imagen (Opcional)</label>
+                
+                <!-- Vista previa de imagen -->
+                <div *ngIf="imagePreview" class="mb-3 image-preview">
+                  <div class="position-relative d-inline-block">
+                    <img [src]="imagePreview" alt="Vista previa" 
+                         class="img-fluid" 
+                         style="max-height: 180px; border-radius: 8px; object-fit: cover;">
+                    <button type="button" 
+                            class="btn btn-sm position-absolute top-0 end-0 rounded-circle remove-image-btn" 
+                            (click)="clearImage()" 
+                            style="transform: translate(30%, -30%); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;"
+                            title="Eliminar imagen">
+                      <i class="fas fa-times text-danger"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Botones para agregar imagen -->
+                <div *ngIf="!imagePreview" class="d-flex gap-2 align-items-center flex-wrap">
+                  <button type="button" 
+                          class="btn btn-link text-primary d-flex align-items-center" 
+                          (click)="selectFromGallery()"
+                          title="Seleccionar desde galería">
+                    <i class="fas fa-images me-2"></i>
+                    <small class="d-none d-md-inline">Galería</small>
+                  </button>
+                  <button type="button" 
+                          class="btn btn-link text-primary d-flex align-items-center" 
+                          (click)="takePhoto()"
+                          title="Tomar fotografía">
+                    <i class="fas fa-camera me-2"></i>
+                    <small class="d-none d-md-inline">Cámara</small>
+                  </button>
+                </div>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button
+                  type="submit"
+                  class="btn btn-success"
+                  [disabled]="nuevaPublicacionForm.invalid || isCreatingPost">
+                  <span *ngIf="isCreatingPost" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  <i *ngIf="!isCreatingPost" class="fas fa-share me-2"></i>
+                  {{ isCreatingPost ? 'Publicando...' : 'Publicar' }}
+                </button>
+                <button type="button" class="btn btn-secondary" (click)="toggleNewPostForm()">
+                  <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje cuando está creando publicación -->
+    <div class="row" *ngIf="showNewPostForm">
+      <div class="col-12 col-lg-8 mx-auto">
+        <div class="text-center text-muted py-5">
+          <i class="fas fa-edit fa-3x mb-3 text-primary"></i>
+          <h5>Creando nueva publicación</h5>
+          <p class="mb-0">Completa el formulario arriba para compartir tus ideas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de publicaciones -->
+    <div class="row" *ngIf="!showNewPostForm">
+      <div class="col-12 col-lg-8 mx-auto">
+        <!-- Controles de ordenamiento -->
+        <div class="card mb-3 border-0 shadow-sm">
+          <div class="card-body py-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted small">
+                <i class="fas fa-list me-1"></i>
+                {{ publicaciones.length }} publicaciones
+              </span>
+              <div class="btn-group btn-group-sm" role="group">
+                <button 
+                  type="button" 
+                  class="btn"
+                  [ngClass]="ordenarPor === 'fecha' ? 'btn-primary' : 'btn-outline-primary'"
+                  (click)="cambiarOrden('fecha')">
+                  <i class="fas fa-clock me-1"></i>Recientes
+                </button>
+                <button 
+                  type="button" 
+                  class="btn"
+                  [ngClass]="ordenarPor === 'likes' ? 'btn-primary' : 'btn-outline-primary'"
+                  (click)="cambiarOrden('likes')">
+                  <i class="fas fa-heart me-1"></i>Populares
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Componentes de publicación -->
+        <app-publicacion-card
+          *ngFor="let publicacion of publicaciones"
+          [publicacion]="publicacion"
+          (onLike)="handleLike($event)"
+          (onUnlike)="handleUnlike($event)"
+          (onDelete)="handleDelete($event)"
+          (onComment)="handleComment($event)">
+        </app-publicacion-card>
+
+        <!-- Mensaje cuando no hay publicaciones -->
+        <div *ngIf="publicaciones.length === 0" class="text-center py-5">
+          <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+          <h4 class="text-muted">No hay publicaciones aún</h4>
+          <p class="text-muted">¡Sé el primero en compartir algo interesante!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Botón flotante para cambiar tema -->
+<button class="theme-toggle" (click)="themeService.toggleDarkMode()" 
+        [title]="themeService.isDarkMode() ? 'Modo Claro' : 'Modo Oscuro'">
+  <i [class]="themeService.isDarkMode() ? 'fas fa-sun' : 'fas fa-moon'"></i>
+</button>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade show" *ngIf="mostrarModalEliminar" 
+     [style.display]="'block'" 
+     [style.background-color]="'rgba(0,0,0,0.5)'"
+     tabindex="-1" 
+     role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-danger text-white border-0">
+        <h5 class="modal-title">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Confirmar Eliminación
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cancelarEliminacion()"></button>
+      </div>
+      <div class="modal-body py-4">
+        <div class="text-center">
+          <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+          <p class="mb-0 fs-5">¿Estás seguro de que deseas eliminar esta publicación?</p>
+          <p class="text-muted mt-2">Esta acción no se puede deshacer.</p>
+        </div>
+      </div>
+      <div class="modal-footer border-0 bg-light">
+        <button type="button" class="btn btn-secondary" (click)="cancelarEliminacion()">
+          <i class="fas fa-times me-1"></i>
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmarEliminacion()">
+          <i class="fas fa-trash me-1"></i>
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
