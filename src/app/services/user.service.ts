@@ -3,12 +3,13 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private API_URL = 'http://localhost:3000/users';
+  private API_URL = `${environment.apiUrl}/users`;
   private isBrowser: boolean;
 
   constructor(
