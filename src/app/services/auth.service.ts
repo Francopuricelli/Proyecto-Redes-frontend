@@ -41,7 +41,7 @@ export class AuthService {
     );
   }
 
-  register(registerData: RegisterRequest): Observable<any> {
+  register(registerData: RegisterRequest | FormData): Observable<any> {
     return this.http.post<any>(`${this.API_URL}/registro`, registerData).pipe(
       tap(response => {
         if (response.user && response.access_token) {

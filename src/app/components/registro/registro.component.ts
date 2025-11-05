@@ -108,12 +108,28 @@ export class RegistroComponent {
       this.isLoading = true;
       this.errorMessage = '';
       
-      const formData = { ...this.registroForm.value };
+      const formData = new FormData();
       
-      // Aquí normalmente subiríamos la imagen al servidor
+      // Agregar todos los campos del formulario
+      Object.keys(this.registroForm.value).forEach(key => {
+        if (key !== 'repetirContraseña') { // No enviar la confirmación de contraseña
+          const value = this.registroForm.value[key];
+          if (value !== null && value !== undefined) {
+            formData.append(key, value);
+          }
+        }
+      });
+      
+      // Agregar la imagen si fue seleccionada
       if (this.selectedFile) {
-        formData.imagenPerfil = URL.createObjectURL(this.selectedFile);
+        formData.append('imagenPerfil', this.selectedFile);
       }
+      
+      // Debug: ver qué se está enviando
+      console.log('FormData contents:');
+      formData.forEach((value, key) => {
+        console.log(key, ':', value);
+      });
       
       this.authService.register(formData)
         .pipe(
@@ -128,11 +144,11 @@ export class RegistroComponent {
             Swal.fire({
               icon: 'success',
               title: '¡Registro exitoso!',
-              text: 'Tu cuenta ha sido creada correctamente. ¡Bienvenido!',
-              confirmButtonText: 'Continuar',
+              text: 'Tu cuenta ha sido creada correctamente. Ahora puedes iniciar sesión.',
+              confirmButtonText: 'Ir al Login',
               confirmButtonColor: '#28a745'
             }).then(() => {
-              this.router.navigate(['/publicaciones']);
+              this.router.navigate(['/login']);
             });
           },
           error: (error) => {
