@@ -48,7 +48,7 @@ export class PublicacionesComponent implements OnInit {
   // ========== PAGINACIÓN Y ORDENAMIENTO ==========
   ordenarPor: 'fecha' | 'likes' = 'fecha'; // Criterio de ordenamiento
   offset: number = 0; // Desde qué publicación cargar (para paginación)
-  limit: number = 10; // Cuántas publicaciones cargar por vez
+  limit: number = 5; // Cuántas publicaciones cargar por vez
   hayMasPublicaciones: boolean = true; // Indica si hay más publicaciones para cargar
   cargandoMas: boolean = false; // Indica si se están cargando más publicaciones
   
@@ -98,7 +98,7 @@ export class PublicacionesComponent implements OnInit {
 
     // Llama al servicio para obtener publicaciones
     // finalize() se ejecuta al terminar (éxito o error)
-    this.publicacionService.getPublicaciones(this.ordenarPor, undefined, this.offset, 100)
+    this.publicacionService.getPublicaciones(this.ordenarPor, undefined, this.offset, this.limit)
       .pipe(
         finalize(() => {
           // Fuerza a Angular a detectar cambios en la vista
@@ -110,8 +110,8 @@ export class PublicacionesComponent implements OnInit {
           console.log('Publicaciones cargadas:', publicaciones);
           // Agrega las nuevas publicaciones al array existente
           this.publicaciones = [...this.publicaciones, ...publicaciones];
-          // Si se obtuvieron 100, probablemente hay más
-          this.hayMasPublicaciones = publicaciones.length === 100;
+          // Si se obtuvieron la cantidad del límite, probablemente hay más
+          this.hayMasPublicaciones = publicaciones.length === this.limit;
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -140,11 +140,17 @@ export class PublicacionesComponent implements OnInit {
     this.offset += this.limit; // Incrementa el offset para obtener las siguientes
     
     this.publicacionService.getPublicaciones(this.ordenarPor, undefined, this.offset, this.limit)
-      .pipe(finalize(() => this.cargandoMas = false))
+      .pipe(
+        finalize(() => {
+          this.cargandoMas = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: (publicaciones) => {
           this.publicaciones = [...this.publicaciones, ...publicaciones];
           this.hayMasPublicaciones = publicaciones.length === this.limit;
+          this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Error al cargar más publicaciones:', error);
