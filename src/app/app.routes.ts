@@ -13,10 +13,30 @@ export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'registro', component: RegistroComponent },
-  { path: 'publicaciones', component: PublicacionesComponent, canActivate: [AuthGuard] },
-  { path: 'publicaciones/:id', component: DetallePublicacionComponent, canActivate: [AuthGuard] },
-  { path: 'perfil', component: MiPerfilComponent, canActivate: [AuthGuard] },
-  { path: 'admin/usuarios', component: DashboardUsuariosComponent, canActivate: [AuthGuard, adminGuard] },
-  { path: 'admin/estadisticas', component: DashboardEstadisticasComponent, canActivate: [AuthGuard, adminGuard] },
+  { 
+    path: 'publicaciones', 
+    component: PublicacionesComponent, 
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'publicaciones/:id', 
+    component: DetallePublicacionComponent, 
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'perfil', 
+    component: MiPerfilComponent, 
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'admin/usuarios', 
+    component: DashboardUsuariosComponent, 
+    canActivate: [AuthGuard, adminGuard]
+  },
+  { 
+    path: 'admin/estadisticas', 
+    component: DashboardEstadisticasComponent, 
+    canActivate: [AuthGuard, adminGuard]
+  },
   { path: '**', redirectTo: '/login' }
 ];
