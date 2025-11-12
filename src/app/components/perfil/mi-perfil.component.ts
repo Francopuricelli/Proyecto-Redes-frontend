@@ -32,7 +32,7 @@ export class MiPerfilComponent implements OnInit {
   // Paginación y ordenamiento para publicaciones
   ordenarPor: 'fecha' | 'likes' = 'fecha';
   offset: number = 0;
-  limit: number = 10;
+  limit: number = 3; // Solo mostrar las últimas 3 publicaciones en el perfil
   hayMasPublicaciones: boolean = true;
   cargandoMas: boolean = false;
   
@@ -302,13 +302,18 @@ export class MiPerfilComponent implements OnInit {
   // Manejadores de eventos del publicacion-card
   handleLike(publicacionId: string) {
     this.publicacionService.darLike(publicacionId).subscribe({
-      next: () => {
+      next: (publicacionActualizada) => {
+        // Actualizar la publicación completa con la respuesta del backend
         const index = this.misPublicaciones.findIndex(p => p.id === publicacionId);
-        if (index !== -1 && this.currentUser?.id) {
-          this.misPublicaciones[index].likes.push(this.currentUser.id);
-          if (this.misPublicaciones[index].cantidadLikes !== undefined) {
-            this.misPublicaciones[index].cantidadLikes!++;
-          }
+        if (index !== -1) {
+          // Actualizar con los datos del backend
+          this.misPublicaciones[index] = {
+            ...this.misPublicaciones[index],
+            likes: publicacionActualizada.likes || [],
+            cantidadLikes: publicacionActualizada.likes?.length || 0
+          };
+          // Forzar detección de cambios
+          this.cdr.detectChanges();
         }
       },
       error: (error) => {
@@ -319,15 +324,18 @@ export class MiPerfilComponent implements OnInit {
 
   handleUnlike(publicacionId: string) {
     this.publicacionService.quitarLike(publicacionId).subscribe({
-      next: () => {
+      next: (publicacionActualizada) => {
+        // Actualizar la publicación completa con la respuesta del backend
         const index = this.misPublicaciones.findIndex(p => p.id === publicacionId);
-        if (index !== -1 && this.currentUser?.id) {
-          this.misPublicaciones[index].likes = this.misPublicaciones[index].likes.filter(
-            id => id !== this.currentUser!.id
-          );
-          if (this.misPublicaciones[index].cantidadLikes !== undefined) {
-            this.misPublicaciones[index].cantidadLikes!--;
-          }
+        if (index !== -1) {
+          // Actualizar con los datos del backend
+          this.misPublicaciones[index] = {
+            ...this.misPublicaciones[index],
+            likes: publicacionActualizada.likes || [],
+            cantidadLikes: publicacionActualizada.likes?.length || 0
+          };
+          // Forzar detección de cambios
+          this.cdr.detectChanges();
         }
       },
       error: (error) => {

@@ -21,14 +21,16 @@
 
 .navbar-brand {
   font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .publicacion-card {
-  transition: transform 0.2s ease-in-out;
-}
-
-.publicacion-card:hover {
-  transform: translateY(-2px);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+  }
 }
 
 .card {
@@ -71,22 +73,32 @@
   text-decoration: none;
 
   &:hover {
-    background-color: rgba(13, 110, 253, 0.1);
+    background-color: rgba(99, 102, 241, 0.1);
     transform: translateY(-1px);
     text-decoration: none;
   }
 
   &:focus {
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
   }
 
   i {
     font-size: 1.1rem;
   }
+  
+  &.text-primary {
+    color: #6366f1 !important;
+    
+    &:hover {
+      color: #4f46e5 !important;
+      background-color: rgba(99, 102, 241, 0.15);
+    }
+  }
 }
 
 .btn-link.text-danger:hover {
   color: #dc3545 !important;
+  background-color: rgba(220, 53, 69, 0.1);
 }
 
 .comments-section {
@@ -120,23 +132,23 @@
 
 /* Estilos para el formulario de nueva publicación */
 .card-body form .form-control:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
 }
 
 .btn-primary {
-  background: linear-gradient(45deg, #007bff, #0056b3);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   border: none;
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
 }
 
 .btn-success {
-  background: linear-gradient(45deg, #28a745, #20c997);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   border: none;
   transition: all 0.3s ease;
 }

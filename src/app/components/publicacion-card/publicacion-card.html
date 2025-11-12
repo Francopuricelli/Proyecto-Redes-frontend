@@ -1,8 +1,11 @@
 <div class="card mb-3 publicacion-card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center">
-      <div class="me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-        <i class="fas fa-user-circle fa-2x text-primary"></i>
+      <div class="me-2" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
+        <img 
+          [src]="publicacion.autor?.imagenPerfil || 'https://ui-avatars.com/api/?name=' + (publicacion.autor?.nombreUsuario || 'U') + '&background=007bff&color=fff&size=40'" 
+          [alt]="publicacion.autor?.nombreUsuario || 'Usuario'"
+          style="width: 100%; height: 100%; object-fit: cover;">
       </div>
       <div>
         <strong>{{ publicacion.autor.nombre }} {{ publicacion.autor.apellido }}</strong>
@@ -22,7 +25,7 @@
     </div>
   </div>
 
-  <div class="card-body">
+  <div class="card-body clickeable" (click)="verDetalle()" style="cursor: pointer;">
     <h5 class="card-title">{{ publicacion.titulo }}</h5>
     <p class="card-text">{{ publicacion.contenido }}</p>
     

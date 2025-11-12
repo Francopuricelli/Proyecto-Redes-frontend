@@ -7,6 +7,12 @@
       </a>
       
       <div class="navbar-nav ms-auto">
+        <a class="nav-link" *ngIf="isAdmin()" routerLink="/admin/usuarios">
+          <i class="fas fa-users-cog me-1"></i>Usuarios
+        </a>
+        <a class="nav-link" *ngIf="isAdmin()" routerLink="/admin/estadisticas">
+          <i class="fas fa-chart-bar me-1"></i>Estadísticas
+        </a>
         <a class="nav-link" routerLink="/perfil">
           <i class="fas fa-user me-1"></i>Mi Perfil
         </a>
@@ -176,8 +182,21 @@
           (onLike)="handleLike($event)"
           (onUnlike)="handleUnlike($event)"
           (onDelete)="handleDelete($event)"
-          (onComment)="handleComment($event)">
+          (onComment)="handleComment($event)"
+          (onClick)="verDetallePublicacion($event)">
         </app-publicacion-card>
+
+        <!-- Botón cargar más publicaciones -->
+        <div *ngIf="hayMasPublicaciones && publicaciones.length > 0" class="text-center mt-4 mb-4">
+          <button 
+            class="btn btn-outline-primary btn-lg"
+            (click)="cargarMasPublicaciones()"
+            [disabled]="cargandoMas">
+            <span *ngIf="cargandoMas" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!cargandoMas" class="fas fa-arrow-down me-2"></i>
+            {{ cargandoMas ? 'Cargando...' : 'Cargar más publicaciones' }}
+          </button>
+        </div>
 
         <!-- Mensaje cuando no hay publicaciones -->
         <div *ngIf="publicaciones.length === 0" class="text-center py-5">

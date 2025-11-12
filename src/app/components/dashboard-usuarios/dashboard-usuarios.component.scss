@@ -1,0 +1,119 @@
+.dashboard-usuarios {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+
+  .card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 8px;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border-bottom: none;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0 !important;
+  }
+
+  h2 {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .table {
+    margin-bottom: 0;
+
+    thead {
+      background-color: #f8f9fa;
+      
+      th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+      }
+    }
+
+    tbody tr {
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+
+  .btn {
+    border-radius: 6px;
+  }
+
+  .alert {
+    border-radius: 6px;
+  }
+
+  // Modal
+  .modal.show {
+    opacity: 1;
+  }
+
+  .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    
+    &.show {
+      opacity: 1;
+    }
+  }
+
+  .modal-xl {
+    max-width: 90%;
+  }
+
+  // Cards dentro del modal de publicaciones
+  .modal-body .card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .card-img-top {
+      border-radius: 8px 8px 0 0;
+    }
+
+    .publicacion-imagen {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      object-position: center;
+      background-color: #f0f0f0;
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .card-text {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .card-footer {
+      padding: 0.75rem 1rem;
+    }
+  }
+}

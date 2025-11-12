@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { PublicacionService } from '../../services/publicacion.service';
 import { AuthService } from '../../services/auth.service';
 import { ImageService } from '../../services/image.service';
@@ -12,6 +12,16 @@ import { PublicacionCardComponent } from '../publicacion-card/publicacion-card';
 import Swal from 'sweetalert2';
 import { finalize } from 'rxjs';
 
+/**
+ * Componente principal de publicaciones.
+ * 
+ * Responsabilidades:
+ * - Mostrar el feed de publicaciones
+ * - Crear nuevas publicaciones con imágenes
+ * - Manejar likes, comentarios y eliminaciones
+ * - Ordenar publicaciones por fecha o likes
+ * - Gestionar paginación (carga de más publicaciones)
+ */
 @Component({
   selector: 'app-publicaciones',
   standalone: true,
@@ -20,64 +30,87 @@ import { finalize } from 'rxjs';
   styleUrls: ['./publicaciones.component.scss']
 })
 export class PublicacionesComponent implements OnInit {
+  // Array de publicaciones que se muestra en el feed
   publicaciones: Publicacion[] = [];
+  
+  // Formulario reactivo para crear nuevas publicaciones
   nuevaPublicacionForm: FormGroup;
+  
+  // Usuario actual autenticado
   currentUser: User | null = null;
-  isCreatingPost = false;
-  showNewPostForm = false;
-  selectedImageFile: File | null = null;
-  imagePreview: string | null = null;
   
-  // Paginación y ordenamiento
-  ordenarPor: 'fecha' | 'likes' = 'fecha';
-  offset: number = 0;
-  limit: number = 10;
-  hayMasPublicaciones: boolean = true;
-  cargandoMas: boolean = false;
+  // Estados de UI
+  isCreatingPost = false; // Indica si se está creando una publicación
+  showNewPostForm = false; // Controla si se muestra el formulario de nueva publicación
+  selectedImageFile: File | null = null; // Archivo de imagen seleccionado
+  imagePreview: string | null = null; // URL de vista previa de la imagen
   
-  // Modal de eliminación
-  mostrarModalEliminar = false;
-  publicacionAEliminar: string | null = null;
+  // ========== PAGINACIÓN Y ORDENAMIENTO ==========
+  ordenarPor: 'fecha' | 'likes' = 'fecha'; // Criterio de ordenamiento
+  offset: number = 0; // Desde qué publicación cargar (para paginación)
+  limit: number = 10; // Cuántas publicaciones cargar por vez
+  hayMasPublicaciones: boolean = true; // Indica si hay más publicaciones para cargar
+  cargandoMas: boolean = false; // Indica si se están cargando más publicaciones
+  
+  // ========== MODAL DE ELIMINACIÓN ==========
+  mostrarModalEliminar = false; // Controla si se muestra el modal de confirmación
+  publicacionAEliminar: string | null = null; // ID de la publicación a eliminar
+  
+  // Mensajes de feedback
   successMessage = '';
   errorMessage = '';
 
   constructor(
-    private fb: FormBuilder,
-    private publicacionService: PublicacionService,
-    public authService: AuthService,
-    private imageService: ImageService,
-    private cdr: ChangeDetectorRef,
-    public themeService: ThemeService
+    private fb: FormBuilder, // Para crear formularios reactivos
+    private publicacionService: PublicacionService, // Servicio para operaciones con publicaciones
+    public authService: AuthService, // Servicio de autenticación
+    private imageService: ImageService, // Servicio para manejar imágenes
+    private cdr: ChangeDetectorRef, // Para forzar detección de cambios en Angular
+    public themeService: ThemeService, // Servicio para tema claro/oscuro
+    private router: Router // Para navegación
   ) {
+    // Inicializa el formulario con validaciones
     this.nuevaPublicacionForm = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(1)]],
       contenido: ['', [Validators.required, Validators.minLength(1)]],
-      imagen: ['']
+      imagen: [''] // Opcional
     });
   }
 
+  /**
+   * Hook de inicialización de Angular.
+   * Se ejecuta cuando el componente se crea.
+   */
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
     this.cargarPublicaciones();
   }
 
+  /**
+   * Carga las publicaciones desde el backend.
+   * @param reset - Si es true, reinicia la paginación y limpia publicaciones existentes
+   */
   cargarPublicaciones(reset: boolean = true) {
     if (reset) {
       this.offset = 0;
       this.publicaciones = [];
     }
 
-    // Cargar todas las publicaciones disponibles (aumentar el límite inicial)
+    // Llama al servicio para obtener publicaciones
+    // finalize() se ejecuta al terminar (éxito o error)
     this.publicacionService.getPublicaciones(this.ordenarPor, undefined, this.offset, 100)
       .pipe(
         finalize(() => {
+          // Fuerza a Angular a detectar cambios en la vista
           this.cdr.detectChanges();
         })
       )
       .subscribe({
         next: (publicaciones) => {
           console.log('Publicaciones cargadas:', publicaciones);
+          // Agrega las nuevas publicaciones al array existente
           this.publicaciones = [...this.publicaciones, ...publicaciones];
+          // Si se obtuvieron 100, probablemente hay más
           this.hayMasPublicaciones = publicaciones.length === 100;
           this.cdr.detectChanges();
         },
@@ -87,16 +120,24 @@ export class PublicacionesComponent implements OnInit {
       });
   }
 
+  /**
+   * Cambia el criterio de ordenamiento de las publicaciones.
+   * @param orden - 'fecha' para ordenar por más recientes, 'likes' para más populares
+   */
   cambiarOrden(orden: 'fecha' | 'likes') {
     this.ordenarPor = orden;
-    this.cargarPublicaciones(true);
+    this.cargarPublicaciones(true); // Recarga desde el inicio
   }
 
+  /**
+   * Carga más publicaciones cuando el usuario hace scroll o click en "Cargar más".
+   * Implementa paginación.
+   */
   cargarMasPublicaciones() {
     if (this.cargandoMas || !this.hayMasPublicaciones) return;
     
     this.cargandoMas = true;
-    this.offset += this.limit;
+    this.offset += this.limit; // Incrementa el offset para obtener las siguientes
     
     this.publicacionService.getPublicaciones(this.ordenarPor, undefined, this.offset, this.limit)
       .pipe(finalize(() => this.cargandoMas = false))
@@ -240,15 +281,24 @@ export class PublicacionesComponent implements OnInit {
   }
 
   // Manejadores de eventos del publicacion-card
+  verDetallePublicacion(publicacionId: string) {
+    this.router.navigate(['/publicaciones', publicacionId]);
+  }
+
   handleLike(publicacionId: string) {
     this.publicacionService.darLike(publicacionId).subscribe({
-      next: () => {
+      next: (publicacionActualizada) => {
+        // Actualizar la publicación completa con la respuesta del backend
         const index = this.publicaciones.findIndex(p => p.id === publicacionId);
-        if (index !== -1 && this.currentUser?.id) {
-          this.publicaciones[index].likes.push(this.currentUser.id);
-          if (this.publicaciones[index].cantidadLikes !== undefined) {
-            this.publicaciones[index].cantidadLikes!++;
-          }
+        if (index !== -1) {
+          // Actualizar con los datos del backend
+          this.publicaciones[index] = {
+            ...this.publicaciones[index],
+            likes: publicacionActualizada.likes || [],
+            cantidadLikes: publicacionActualizada.likes?.length || 0
+          };
+          // Forzar detección de cambios
+          this.cdr.detectChanges();
         }
       },
       error: (error) => {
@@ -259,15 +309,18 @@ export class PublicacionesComponent implements OnInit {
 
   handleUnlike(publicacionId: string) {
     this.publicacionService.quitarLike(publicacionId).subscribe({
-      next: () => {
+      next: (publicacionActualizada) => {
+        // Actualizar la publicación completa con la respuesta del backend
         const index = this.publicaciones.findIndex(p => p.id === publicacionId);
-        if (index !== -1 && this.currentUser?.id) {
-          this.publicaciones[index].likes = this.publicaciones[index].likes.filter(
-            id => id !== this.currentUser!.id
-          );
-          if (this.publicaciones[index].cantidadLikes !== undefined) {
-            this.publicaciones[index].cantidadLikes!--;
-          }
+        if (index !== -1) {
+          // Actualizar con los datos del backend
+          this.publicaciones[index] = {
+            ...this.publicaciones[index],
+            likes: publicacionActualizada.likes || [],
+            cantidadLikes: publicacionActualizada.likes?.length || 0
+          };
+          // Forzar detección de cambios
+          this.cdr.detectChanges();
         }
       },
       error: (error) => {
@@ -337,5 +390,9 @@ export class PublicacionesComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  isAdmin(): boolean {
+    return this.authService.isAdmin();
   }
 }

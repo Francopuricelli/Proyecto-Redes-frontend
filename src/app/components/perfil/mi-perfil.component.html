@@ -261,9 +261,11 @@
             <div class="d-flex justify-content-between align-items-center">
               <h5 class="mb-0">
                 <i class="fas fa-newspaper me-2 text-primary"></i>
-                Mis Publicaciones
+                Mis Últimas 3 Publicaciones
               </h5>
-              <!-- Controles de ordenamiento -->
+              <!-- Controles de ordenamiento - OCULTOS: Solo mostramos las últimas 3 por fecha -->
+              <!-- 
+              <!-- 
               <div class="btn-group btn-group-sm" role="group">
                 <button 
                   type="button" 
@@ -280,6 +282,7 @@
                   <i class="fas fa-heart me-1"></i>Populares
                 </button>
               </div>
+              -->
             </div>
           </div>
           <div class="card-body">
@@ -310,7 +313,8 @@
                 (onComment)="handleComment($event)">
               </app-publicacion-card>
 
-              <!-- Botón cargar más -->
+              <!-- Botón cargar más - OCULTO: Solo mostramos las últimas 3 publicaciones en el perfil -->
+              <!-- 
               <div *ngIf="hayMasPublicaciones && misPublicaciones.length > 0" class="text-center mt-4">
                 <button 
                   class="btn btn-outline-primary"
@@ -321,6 +325,7 @@
                   {{ cargandoMas ? 'Cargando...' : 'Cargar más publicaciones' }}
                 </button>
               </div>
+              -->
 
               <!-- Sin publicaciones -->
               <div *ngIf="misPublicaciones.length === 0 && !cargandoPublicaciones" class="text-center py-5">

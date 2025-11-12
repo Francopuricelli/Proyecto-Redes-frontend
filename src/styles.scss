@@ -4,6 +4,66 @@
 /* Font Awesome */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
+/* Variables de color - Tema Luna (Azul-Violeta) */
+:root {
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --secondary-color: #8b5cf6;
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --gradient-hover: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+/* Override Bootstrap primary color */
+.bg-primary {
+  background: var(--gradient-primary) !important;
+}
+
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  border: none;
+  
+  &:hover {
+    background: var(--gradient-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  }
+
+  &:active, &:focus {
+    background: var(--gradient-hover);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+  }
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  
+  &:hover {
+    background: var(--gradient-primary);
+    border-color: transparent;
+    color: white;
+  }
+}
+
+.badge.bg-primary {
+  background: var(--gradient-primary) !important;
+}
+
+/* Navbar con degradado */
+.navbar.bg-primary {
+  background: var(--gradient-primary) !important;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
 /* Global styles for Red Social */
 * {
   margin: 0;
@@ -25,6 +85,27 @@ body {
   transition: all 0.3s ease;
 }
 
+.btn-primary {
+  background: var(--gradient-primary);
+  border: none;
+  
+  &:hover {
+    background: var(--gradient-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  }
+}
+
+.btn-info {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  
+  &:hover {
+    background: var(--gradient-hover);
+  }
+}
+
 .card {
   border: none;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
@@ -38,8 +119,8 @@ body {
 }
 
 .form-control:focus {
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+  border-color: var(--primary-light);
 }
 
 .modal-content {
@@ -58,7 +139,7 @@ body {
 }
 
 .text-gradient {
-  background: linear-gradient(45deg, #007bff, #0056b3);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -299,6 +380,41 @@ body.dark-mode {
     border-color: currentColor;
     border-right-color: transparent;
   }
+
+  /* Dashboard Admin - Modo Oscuro */
+  .dashboard-usuarios,
+  .dashboard-estadisticas {
+    background-color: #1a1a1a !important;
+
+    .card {
+      background-color: #2d2d2d;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .table {
+      background-color: #2d2d2d;
+
+      thead {
+        background-color: #252525;
+      }
+
+      tbody tr:hover {
+        background-color: #353535 !important;
+      }
+    }
+
+    .btn-group .btn {
+      border-color: #404040;
+    }
+
+    .modal-body .card {
+      background-color: #2d2d2d;
+    }
+
+    .publicacion-imagen {
+      background-color: #1a1a1a;
+    }
+  }
 }
 
 /* Toggle para dark mode */
@@ -310,9 +426,9 @@ body.dark-mode {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   border: none;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.5);
   color: white;
   font-size: 24px;
   cursor: pointer;
@@ -323,7 +439,7 @@ body.dark-mode {
 
   &:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
   }
 
   &:active {

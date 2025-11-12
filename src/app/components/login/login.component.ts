@@ -52,7 +52,7 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value)
         .pipe(
           finalize(() => {
-            // Esto SIEMPRE se ejecuta, haya error o no
+  
             this.isLoading = false;
           })
         )

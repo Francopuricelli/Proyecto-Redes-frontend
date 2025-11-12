@@ -16,6 +16,7 @@ export class PublicacionCardComponent {
   @Output() onUnlike = new EventEmitter<string>();
   @Output() onDelete = new EventEmitter<string>();
   @Output() onComment = new EventEmitter<{ publicacionId: string, comentario: string }>();
+  @Output() onClick = new EventEmitter<string>();  // ⬅️ NUEVO
 
   nuevoComentario: string = '';
   mostrarComentarios: boolean = false;
@@ -57,5 +58,9 @@ export class PublicacionCardComponent {
 
   toggleComentarios(): void {
     this.mostrarComentarios = !this.mostrarComentarios;
+  }
+
+  verDetalle(): void {
+    this.onClick.emit(this.publicacion.id);
   }
 }

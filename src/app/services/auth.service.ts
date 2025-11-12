@@ -17,7 +17,7 @@ export class AuthService {
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // Solo acceder a localStorage si estamos en el navegador
+   
     if (isPlatformBrowser(this.platformId)) {
       const savedUser = localStorage.getItem('currentUser');
       if (savedUser) {
@@ -91,7 +91,34 @@ export class AuthService {
     return !!this.getLocalStorageItem('access_token');
   }
 
+  isAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return user?.perfil === 'administrador';
+  }
+
   getToken(): string | null {
     return this.getLocalStorageItem('access_token');
+  }
+
+  autorizar(): Observable<User> {
+    return this.http.post<User>(`${this.API_URL}/autorizar`, {}, {
+      headers: {
+        'Authorization': `Bearer ${this.getToken()}`
+      }
+    });
+  }
+
+  refrescarToken(): Observable<{ access_token: string }> {
+    return this.http.post<{ access_token: string }>(`${this.API_URL}/refrescar`, {}, {
+      headers: {
+        'Authorization': `Bearer ${this.getToken()}`
+      }
+    }).pipe(
+      tap(response => {
+        if (response.access_token) {
+          this.setLocalStorageItem('access_token', response.access_token);
+        }
+      })
+    );
   }
 }

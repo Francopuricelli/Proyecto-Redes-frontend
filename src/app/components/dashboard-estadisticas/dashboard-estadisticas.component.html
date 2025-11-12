@@ -1,0 +1,81 @@
+<div class="dashboard-estadisticas">
+  <div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-chart-bar me-2"></i>Estadísticas del Sistema</h2>
+
+    <!-- Alerta de error -->
+    <div class="alert alert-danger" role="alert" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <!-- Pantalla de carga -->
+    <div class="text-center py-5" *ngIf="cargando">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">Cargando estadísticas...</span>
+      </div>
+      <p class="mt-3">Cargando estadísticas...</p>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row" *ngIf="!cargando">
+      <!-- Gráfico de Publicaciones por Usuario -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <canvas id="chartPublicaciones" style="max-height: 400px;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico de Comentarios en el Tiempo -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <canvas id="chartComentariosTiempo" style="max-height: 400px;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico de Comentarios por Publicación -->
+      <div class="col-lg-12 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <canvas id="chartComentariosPublicacion" style="max-height: 500px;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen de datos -->
+    <div class="row mt-4" *ngIf="!cargando">
+      <div class="col-md-4 mb-3">
+        <div class="card text-center stat-card bg-primary text-white">
+          <div class="card-body">
+            <i class="fas fa-users fa-3x mb-3"></i>
+            <h3>{{ publicacionesPorUsuario.length }}</h3>
+            <p class="mb-0">Usuarios con Publicaciones</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="card text-center stat-card bg-success text-white">
+          <div class="card-body">
+            <i class="fas fa-comments fa-3x mb-3"></i>
+            <h3>{{ totalComentarios }}</h3>
+            <p class="mb-0">Total de Comentarios</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="card text-center stat-card bg-info text-white">
+          <div class="card-body">
+            <i class="fas fa-file-alt fa-3x mb-3"></i>
+            <h3>{{ comentariosPorPublicacion.length }}</h3>
+            <p class="mb-0">Publicaciones con Comentarios</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

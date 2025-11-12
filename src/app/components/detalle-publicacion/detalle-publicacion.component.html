@@ -1,0 +1,121 @@
+<div class="detalle-container">
+  <button class="btn-volver" (click)="volver()">← Volver a publicaciones</button>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading state para la publicación -->
+  <div *ngIf="cargando && !publicacion" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando publicación...</p>
+  </div>
+
+  <div *ngIf="publicacion && !cargando" class="publicacion-detalle">
+    <div class="publicacion-header">
+      <img 
+        [src]="getAvatarUrl()" 
+        [alt]="publicacion.autor?.nombreUsuario || 'Usuario'" 
+        class="avatar"
+        (error)="onAvatarError($event)">
+      <div class="autor-info">
+        <h3>{{ publicacion.autor?.nombre || 'Usuario' }} {{ publicacion.autor?.apellido || '' }}</h3>
+        <p class="username">@{{ publicacion.autor?.nombreUsuario || 'usuario' }}</p>
+      </div>
+    </div>
+
+    <h2 class="publicacion-titulo">{{ publicacion.titulo }}</h2>
+    <p class="publicacion-contenido">{{ publicacion.contenido }}</p>
+
+    <img 
+      *ngIf="publicacion.imagen && !imagenPublicacionError" 
+      [src]="publicacion.imagen" 
+      alt="Imagen publicación" 
+      class="publicacion-imagen"
+      (error)="onImagenPublicacionError($event)">
+
+    <div class="publicacion-footer">
+      <button class="btn-like" (click)="usuarioDioLike() ? quitarLike() : darLike()">
+        <span [class.liked]="usuarioDioLike()">❤</span> {{ publicacion.cantidadLikes || publicacion.likes?.length || 0 }}
+      </button>
+      <span class="fecha">{{ publicacion.fecha | date:'short' }}</span>
+    </div>
+  </div>
+
+  <div class="comentarios-section">
+    <h3>Comentarios ({{ totalComentarios }})</h3>
+
+    <!-- Agregar nuevo comentario -->
+    <div class="agregar-comentario">
+      <textarea 
+        [(ngModel)]="nuevoComentario" 
+        placeholder="Escribe un comentario..."
+        rows="3"
+        class="textarea-comentario"
+      ></textarea>
+      <button (click)="agregarComentario()" class="btn-comentar" [disabled]="!nuevoComentario.trim()">
+        Comentar
+      </button>
+    </div>
+
+    <!-- Lista de comentarios -->
+    <div class="comentarios-lista">
+      <div *ngFor="let comentario of comentarios" class="comentario">
+        <div class="comentario-header">
+          <img [src]="comentario.autor?.imagenPerfil || 'assets/default-avatar.png'" alt="Avatar" class="avatar-small">
+          <div class="comentario-autor">
+            <strong>{{ comentario.autor?.nombre }} {{ comentario.autor?.apellido }}</strong>
+            <span class="username-small">@{{ comentario.autor?.nombreUsuario }}</span>
+            <span *ngIf="comentario.modificado" class="badge-editado">editado</span>
+          </div>
+          <button 
+            *ngIf="esAutorComentario(comentario) && comentarioEditando !== comentario.id" 
+            (click)="iniciarEdicion(comentario)"
+            class="btn-editar"
+          >
+            ✏️
+          </button>
+        </div>
+
+        <!-- Modo vista -->
+        <p *ngIf="comentarioEditando !== comentario.id" class="comentario-texto">
+          {{ comentario.comentario }}
+        </p>
+
+        <!-- Modo edición -->
+        <div *ngIf="comentarioEditando === comentario.id" class="comentario-edicion">
+          <textarea 
+            [(ngModel)]="textoEditado" 
+            rows="2"
+            class="textarea-editar"
+          ></textarea>
+          <div class="botones-edicion">
+            <button (click)="guardarEdicion(comentario.id)" class="btn-guardar">Guardar</button>
+            <button (click)="cancelarEdicion()" class="btn-cancelar">Cancelar</button>
+          </div>
+        </div>
+
+        <span class="comentario-fecha">{{ comentario.fecha | date:'short' }}</span>
+      </div>
+
+      <!-- Botón cargar más -->
+      <button 
+        *ngIf="hayMasComentarios()" 
+        (click)="cargarMasComentarios()" 
+        class="btn-cargar-mas"
+        [disabled]="cargando"
+      >
+        {{ cargando ? 'Cargando...' : 'Cargar más comentarios' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="cargando && !publicacion" class="loading">
+    <div class="spinner"></div>
+    <p>Cargando publicación...</p>
+  </div>
+
+  <div *ngIf="!publicacion && !errorMessage && !cargando" class="loading">
+    Publicación no encontrada
+  </div>
+</div>

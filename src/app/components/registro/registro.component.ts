@@ -153,10 +153,19 @@ export class RegistroComponent {
           },
           error: (error) => {
             console.error('Error de registro:', error);
+            console.error('Error completo:', JSON.stringify(error.error));
+            
             // Mostrar error con SweetAlert
             let errorMessage = 'Error al registrar usuario. Intente nuevamente.';
             
-            if (error.status === 400) {
+            if (error.error?.message) {
+              // Si el mensaje es un array (validaciones de class-validator)
+              if (Array.isArray(error.error.message)) {
+                errorMessage = error.error.message.join(', ');
+              } else {
+                errorMessage = error.error.message;
+              }
+            } else if (error.status === 400) {
               errorMessage = 'Los datos ingresados no son válidos. Verifique la información.';
             } else if (error.status === 409) {
               errorMessage = 'El correo o nombre de usuario ya están registrados.';

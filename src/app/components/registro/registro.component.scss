@@ -1,5 +1,5 @@
 .registro-container {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
 }
 
 .card {
@@ -8,7 +8,7 @@
 }
 
 .card-header {
-  background: linear-gradient(45deg, #28a745, #20c997) !important;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
   border: none;
 }
 
@@ -28,12 +28,12 @@
 }
 
 .form-control:focus {
-  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-  border-color: #80d4a6;
+  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+  border-color: #818cf8;
 }
 
 .btn-success {
-  background: linear-gradient(45deg, #28a745, #20c997);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border: none;
   font-weight: 500;
   letter-spacing: 0.5px;
@@ -42,7 +42,7 @@
 
 .btn-success:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+  box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
 }
 
 .btn-success:disabled {
