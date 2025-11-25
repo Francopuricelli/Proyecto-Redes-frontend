@@ -1,2 +1,7 @@
+<div *ngIf="sessionCountdown > 0" class="session-countdown-badge">
+  <i class="fas fa-clock me-2"></i>
+  Sesión: {{ formatTime(sessionCountdown) }}
+</div>
+
 <router-outlet></router-outlet>
 <app-session-modal></app-session-modal>

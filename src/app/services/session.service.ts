@@ -7,8 +7,8 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class SessionService {
-  private readonly SESSION_WARNING_TIME = 10 * 60 * 1000; // 10 minutos (mostrar modal)
-  private readonly TOKEN_EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutos (expiración total)
+  private readonly SESSION_WARNING_TIME = 5 * 60 * 1000; // 5 minutos (mostrar modal)
+  private readonly TOKEN_EXPIRATION_TIME = 10 * 60 * 1000; // 10 minutos (expiración total)
   private sessionTimer: Subscription | null = null;
   private warningTimer: Subscription | null = null;
   private expirationTimer: Subscription | null = null;
@@ -16,6 +16,7 @@ export class SessionService {
   private modalMostrado: boolean = false;
   
   public showWarningModal$ = new Subject<boolean>();
+  public sessionCountdown$ = new Subject<number>();
 
   constructor(
     private authService: AuthService,
@@ -27,11 +28,17 @@ export class SessionService {
     this.modalMostrado = false;
     this.detenerMonitoreo();
 
-    // Timer para mostrar el modal exactamente a los 10 minutos
+    // Timer para emitir countdown continuo desde el inicio
     this.warningTimer = interval(1000).subscribe(() => {
       const tiempoTranscurrido = Date.now() - this.sessionStartTime;
+      const tiempoRestante = this.TOKEN_EXPIRATION_TIME - tiempoTranscurrido;
 
-      // Mostrar modal SOLO una vez a los 10 minutos
+      // Emitir countdown en segundos continuamente
+      if (tiempoRestante > 0) {
+        this.sessionCountdown$.next(Math.floor(tiempoRestante / 1000));
+      }
+
+      // Mostrar modal SOLO una vez a los 10 minutos (cuando quedan 5 min)
       if (tiempoTranscurrido >= this.SESSION_WARNING_TIME && !this.modalMostrado) {
         this.modalMostrado = true;
         this.showWarningModal$.next(true);
@@ -66,13 +73,11 @@ export class SessionService {
   extenderSesion(): void {
     this.authService.refrescarToken().subscribe({
       next: (response: any) => {
-        console.log('Token refrescado exitosamente');
         // Reiniciar monitoreo con nuevo tiempo
         this.showWarningModal$.next(false);
         this.iniciarMonitoreo();
       },
       error: (error: any) => {
-        console.error('Error al refrescar token:', error);
         this.cerrarSesion();
       }
     });
