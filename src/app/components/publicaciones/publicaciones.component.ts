@@ -72,7 +72,7 @@ export class PublicacionesComponent implements OnInit {
     // Inicializa el formulario con validaciones
     this.nuevaPublicacionForm = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(1)]],
-      contenido: ['', [Validators.required, Validators.minLength(1)]],
+      contenido: ['', [Validators.required, Validators.minLength(1),Validators.maxLength(300)]],
       imagen: [''] // Opcional
     });
   }

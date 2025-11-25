@@ -16,10 +16,12 @@ export class PublicacionCardComponent {
   @Output() onUnlike = new EventEmitter<string>();
   @Output() onDelete = new EventEmitter<string>();
   @Output() onComment = new EventEmitter<{ publicacionId: string, comentario: string }>();
-  @Output() onClick = new EventEmitter<string>();  // ⬅️ NUEVO
+  @Output() onClick = new EventEmitter<string>();
 
   nuevoComentario: string = '';
   mostrarComentarios: boolean = false;
+  comentariosMostrados: number = 3;
+  readonly comentariosPorCarga: number = 3;
 
   constructor(private authService: AuthService) {}
 
@@ -62,5 +64,17 @@ export class PublicacionCardComponent {
 
   verDetalle(): void {
     this.onClick.emit(this.publicacion.id);
+  }
+
+  get comentariosVisibles() {
+    return this.publicacion.comentarios.slice(0, this.comentariosMostrados);
+  }
+
+  get hayMasComentarios(): boolean {
+    return this.publicacion.comentarios.length > this.comentariosMostrados;
+  }
+
+  cargarMasComentarios(): void {
+    this.comentariosMostrados += this.comentariosPorCarga;
   }
 }

@@ -61,7 +61,7 @@
       <hr>
       
       <!-- Lista de comentarios -->
-      <div *ngFor="let comentario of publicacion.comentarios" class="comentario mb-3">
+      <div *ngFor="let comentario of comentariosVisibles" class="comentario mb-3">
         <div class="d-flex">
           <div class="me-2" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
             <!-- Imagen de perfil del autor del comentario -->
@@ -81,6 +81,16 @@
             <small class="text-muted ms-2">{{ comentario.fecha | date: 'dd/MM/yyyy HH:mm' }}</small>
           </div>
         </div>
+      </div>
+
+      <!-- Botón cargar más comentarios -->
+      <div *ngIf="hayMasComentarios" class="text-center my-3">
+        <button 
+          class="btn btn-sm btn-outline-primary"
+          (click)="cargarMasComentarios()">
+          <i class="fas fa-chevron-down me-1"></i>
+          Cargar más comentarios ({{ publicacion.comentarios.length - comentariosMostrados }} restantes)
+        </button>
       </div>
 
       <!-- Formulario para nuevo comentario -->

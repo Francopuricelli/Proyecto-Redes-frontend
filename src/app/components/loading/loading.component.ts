@@ -60,7 +60,9 @@ export class LoadingComponent implements OnInit {
     const token = this.authService.getToken();
     
     if (!token) {
-      this.router.navigate(['/login']);
+      setTimeout(() => {
+        this.router.navigate(['/login']);
+      }, 500);
       return;
     }
 
@@ -68,12 +70,17 @@ export class LoadingComponent implements OnInit {
     this.authService.autorizar().subscribe({
       next: (user: any) => {
         console.log('Token válido, usuario:', user);
-        // El token es válido, continuar
+        // El token es válido, redirigir a publicaciones
+        setTimeout(() => {
+          this.router.navigate(['/publicaciones']);
+        }, 500);
       },
       error: (error: any) => {
         console.error('Token inválido:', error);
         this.authService.logout();
-        this.router.navigate(['/login']);
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 500);
       }
     });
   }
