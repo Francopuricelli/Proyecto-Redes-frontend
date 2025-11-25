@@ -19,7 +19,7 @@ export class DetallePublicacionComponent implements OnInit {
   comentarioEditando: string | null = null;
   textoEditado: string = '';
   offset: number = 0;
-  limit: number = 10;
+  limit: number = 3;
   totalComentarios: number = 0;
   cargando: boolean = false;
   cargandoComentarios: boolean = false;

@@ -7,10 +7,13 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class SessionService {
-  private readonly SESSION_WARNING_TIME = 10 * 60 * 1000; // 10 minutos en milisegundos
-  private readonly TOKEN_EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutos en milisegundos
+  private readonly SESSION_WARNING_TIME = 10 * 60 * 1000; // 10 minutos (mostrar modal)
+  private readonly TOKEN_EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutos (expiración total)
   private sessionTimer: Subscription | null = null;
-  private lastActivityTime: number = Date.now();
+  private warningTimer: Subscription | null = null;
+  private expirationTimer: Subscription | null = null;
+  private sessionStartTime: number = Date.now();
+  private modalMostrado: boolean = false;
   
   public showWarningModal$ = new Subject<boolean>();
 
@@ -20,52 +23,53 @@ export class SessionService {
   ) {}
 
   iniciarMonitoreo(): void {
-    this.lastActivityTime = Date.now();
+    this.sessionStartTime = Date.now();
+    this.modalMostrado = false;
     this.detenerMonitoreo();
 
-    // Verificar cada minuto
-    this.sessionTimer = interval(60000).subscribe(() => {
-      const tiempoTranscurrido = Date.now() - this.lastActivityTime;
+    // Timer para mostrar el modal exactamente a los 10 minutos
+    this.warningTimer = interval(1000).subscribe(() => {
+      const tiempoTranscurrido = Date.now() - this.sessionStartTime;
 
-      if (tiempoTranscurrido >= this.SESSION_WARNING_TIME && tiempoTranscurrido < this.TOKEN_EXPIRATION_TIME) {
-        // Mostrar modal de advertencia a los 10 minutos
+      // Mostrar modal SOLO una vez a los 10 minutos
+      if (tiempoTranscurrido >= this.SESSION_WARNING_TIME && !this.modalMostrado) {
+        this.modalMostrado = true;
         this.showWarningModal$.next(true);
-      } else if (tiempoTranscurrido >= this.TOKEN_EXPIRATION_TIME) {
-        // Cerrar sesión automáticamente a los 15 minutos
-        this.cerrarSesion();
       }
     });
 
-    // Monitorear actividad del usuario
-    this.monitorearActividad();
+    // Timer para cerrar sesión automáticamente a los 15 minutos si no se extendió
+    this.expirationTimer = interval(1000).subscribe(() => {
+      const tiempoTranscurrido = Date.now() - this.sessionStartTime;
+
+      if (tiempoTranscurrido >= this.TOKEN_EXPIRATION_TIME) {
+        this.cerrarSesion();
+      }
+    });
   }
 
   detenerMonitoreo(): void {
+    if (this.warningTimer) {
+      this.warningTimer.unsubscribe();
+      this.warningTimer = null;
+    }
+    if (this.expirationTimer) {
+      this.expirationTimer.unsubscribe();
+      this.expirationTimer = null;
+    }
     if (this.sessionTimer) {
       this.sessionTimer.unsubscribe();
       this.sessionTimer = null;
     }
   }
 
-  private monitorearActividad(): void {
-    if (typeof window !== 'undefined') {
-      // Resetear timer en cualquier actividad del usuario
-      ['click', 'keypress', 'scroll', 'mousemove'].forEach(event => {
-        window.addEventListener(event, () => this.resetearTimer(), { passive: true });
-      });
-    }
-  }
-
-  resetearTimer(): void {
-    this.lastActivityTime = Date.now();
-  }
-
   extenderSesion(): void {
     this.authService.refrescarToken().subscribe({
       next: (response: any) => {
         console.log('Token refrescado exitosamente');
-        this.resetearTimer();
+        // Reiniciar monitoreo con nuevo tiempo
         this.showWarningModal$.next(false);
+        this.iniciarMonitoreo();
       },
       error: (error: any) => {
         console.error('Error al refrescar token:', error);

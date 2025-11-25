@@ -11,13 +11,14 @@ import { SessionService } from '../../services/session.service';
     <div *ngIf="mostrarModal" class="modal-overlay">
       <div class="modal">
         <h2>⚠️ Advertencia de Sesión</h2>
-        <p>Tu sesión está por expirar. ¿Qué deseas hacer?</p>
+        <p><strong>Tu sesión expirará en 5 minutos.</strong></p>
+        <p>¿Deseas extender tu sesión?</p>
         <div class="modal-buttons">
           <button class="btn-extender" (click)="extenderSesion()">
-            Extender Sesión
+            Sí, extender sesión
           </button>
           <button class="btn-cerrar" (click)="cerrarSesion()">
-            Cerrar Sesión
+            No, cerrar sesión
           </button>
         </div>
       </div>
