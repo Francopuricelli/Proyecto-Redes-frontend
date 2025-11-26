@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { UsuariosService, Usuario, CrearUsuarioDto } from '../../services/usuarios.service';
 import { PublicacionService } from '../../services/publicacion.service';
 import { finalize } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dashboard-usuarios',
@@ -263,23 +264,63 @@ export class DashboardUsuariosComponent implements OnInit {
   }
 
   eliminarPublicacion(publicacionId: string) {
-    if (!confirm('¿Está seguro de eliminar esta publicación?')) {
+    console.log('=== DEBUG ELIMINAR ===');
+    console.log('publicacionId recibido:', publicacionId);
+    console.log('tipo:', typeof publicacionId);
+    console.log('publicaciones cargadas:', this.publicacionesUsuario);
+    
+    if (!publicacionId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'ID de publicación no válido',
+        icon: 'error',
+        confirmButtonColor: '#dc3545'
+      });
       return;
     }
-
-    this.publicacionService.eliminarPublicacion(publicacionId).subscribe({
-      next: () => {
-        this.exitoMensaje = 'Publicación eliminada exitosamente';
-        // Recargar publicaciones del usuario
-        if (this.usuarioSeleccionado) {
-          this.cargarPublicacionesUsuario(this.usuarioSeleccionado._id);
-        }
-        this.cdr.detectChanges();
-      },
-      error: (error: any) => {
-        console.error('Error al eliminar publicación:', error);
-        this.error = 'Error al eliminar la publicación';
-        this.cdr.detectChanges();
+    
+    Swal.fire({
+      title: '¿Eliminar publicación?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log('Intentando eliminar publicación:', publicacionId);
+        this.publicacionService.eliminarPublicacion(publicacionId).subscribe({
+          next: () => {
+            console.log('Publicación eliminada exitosamente');
+            Swal.fire({
+              title: '¡Eliminada!',
+              text: 'La publicación ha sido eliminada',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            // Recargar publicaciones del usuario
+            if (this.usuarioSeleccionado) {
+              this.cargarPublicacionesUsuario(this.usuarioSeleccionado._id);
+            }
+            this.cdr.detectChanges();
+          },
+          error: (error: any) => {
+            console.error('Error al eliminar publicación:', error);
+            console.error('Detalles del error:', error.error);
+            console.error('Status:', error.status);
+            Swal.fire({
+              title: 'Error',
+              text: error.error?.message || 'No se pudo eliminar la publicación',
+              icon: 'error',
+              confirmButtonColor: '#dc3545'
+            });
+            this.error = 'Error al eliminar la publicación';
+            this.cdr.detectChanges();
+          }
+        });
       }
     });
   }
